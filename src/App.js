@@ -2,10 +2,9 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import * as firebase from "firebase";
-import * as Firepad from "firepad";
-import * as CodeMirror from "codemirror";
+import CodeMirror from "codemirror";
 
-class App extends Component {
+class App extends Component{
   render() {
     return (
       <div className="App">
@@ -16,6 +15,7 @@ class App extends Component {
         <p className="App-intro">
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
+        <div id='codeArea'></div>
       </div>
     );
   }
@@ -28,14 +28,8 @@ const config = {
 };
 firebase.initializeApp(config);
 
-// Get Firebase Database reference.
-const firepadRef = firebase.database().ref();
+const firebaseDB = firebase.database().ref();
 
-// Create CodeMirror (with lineWrapping on).
-const codeMirror = CodeMirror(document.getElementById('firepad'), { lineWrapping: true });
-
-// Create Firepad (with rich text toolbar and shortcuts enabled).
-const firepad = Firepad.fromCodeMirror(firepadRef, codeMirror,
-    { richTextShortcuts: true, richTextToolbar: true, defaultText: 'Hello, World!' });
+const codeMirror = CodeMirror(document.getElementById('codeArea'), { lineWrapping: true });
 
 export default App;

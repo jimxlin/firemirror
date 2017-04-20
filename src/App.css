@@ -1,3 +1,6 @@
+@import "firepad.css";
+@import "codemirror.css";
+
 .App {
   text-align: center;
 }

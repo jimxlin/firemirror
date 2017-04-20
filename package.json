@@ -4,11 +4,10 @@
   "private": true,
   "dependencies": {
     "bootstrap": "^4.0.0-alpha.6",
-    "codemirror": "^5.25.0",
     "firebase": "^3.7.8",
-    "firepad": "^1.4.0",
     "react": "^15.5.4",
     "react-bootstrap": "^0.30.8",
+    "react-codemirror": "^0.3.0",
     "react-dom": "^15.5.4"
   },
   "devDependencies": {

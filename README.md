@@ -1,2 +1,2 @@
-# FireREPL
-Combining the Firepad and Repl.it APIs with Create React App.
+# FireReple
+Collaborative coding app using Firebase and Repl.it.
