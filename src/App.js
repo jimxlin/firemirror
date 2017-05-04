@@ -9,7 +9,6 @@ import randomstring from 'randomstring';
 class App extends Component{
   constructor() {
     super();
-    this.state = {code: 'somestring'};
     // this.callback = this.callback.bind(this); // this function will detect changes in text
   }
 
@@ -19,23 +18,23 @@ class App extends Component{
 
   initializeApi() {
     firebase.initializeApp(config);
-
     var url = window.location;
     var token = '';
+    var userId = randomstring.generate(16);;
     if (url.pathname.length === 1) {
+      console.log('trigger create session');
       token = randomstring.generate();
-      url.pathname = token;
+      this.codeSession = firebase.database().ref(token);
+      this.codeSession.set({code: '', language: '', userId: userId});
+      history.pushState(null, null, '/'+token);
     } else {
+      console.log('trigger join session');
       token = url.pathname.slice(1, -1);
+      this.codeSession = firebase.database().ref(token);
     }
-
-    this.codeSession = firebase.database().ref(token)
-    this.codeSession.set('codetext');
-    this.codeMirror = CodeMirror(document.getElementById('codeArea'), { lineWrapping: true });
   }
 
   render() {
-    // this.codeSession is accessible
     return (
       <div className="App">
         <div className="App-header">
@@ -51,10 +50,15 @@ class App extends Component{
 class CodeArea extends Component {
   constructor() {
     super();
-
+    this.state = {code: 'somestring'};
   }
+
+  componentDidMount() {
+    this.codeMirror = CodeMirror(document.getElementById('codeArea'), { lineWrapping: true });
+  }
+
   render() {
-    return <div id='codeArea'></div>
+    return <div id='codeArea'></div> //how to detect changes to text here?
   }
 }
 
