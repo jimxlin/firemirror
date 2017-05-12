@@ -5,6 +5,15 @@ import './App.css';
 import * as firebase from 'firebase';
 import CodeMirror from 'codemirror';
 import randomstring from 'randomstring';
+import debounce from 'lodash.debounce';
+
+const config = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOM,
+  databaseURL: process.env.REACT_APP_FIREBASE_DB_URL,
+  projectId: process.env.REACT_APP_FIREBASE_PROJ_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STOR_BUCKET
+};
 
 class App extends Component{
   constructor() {
@@ -66,16 +75,8 @@ class CodeArea extends Component {
   }
 
   render() {
-    return <div id='codeArea' onKeyUp={this.getCode}></div>
+    return <div id='codeArea' onKeyUp={debounce(this.getCode, 500)}></div>
   }
 }
-
-const config = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOM,
-  databaseURL: process.env.REACT_APP_FIREBASE_DB_URL,
-  projectId: process.env.REACT_APP_FIREBASE_PROJ_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STOR_BUCKET
-};
 
 export default App;
