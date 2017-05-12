@@ -19,28 +19,35 @@ class App extends Component{
   constructor() {
     super();
     this.handleKeyUp = this.handleKeyUp.bind(this);
+    this.state = {codeString: ''}
   }
 
   initializeApi() {
     firebase.initializeApp(config);
     var url = window.location;
     var sessionId = '';
-    var userId = randomstring.generate(16);
+    this.userId = randomstring.generate(16);
     //initialize session
     if (url.pathname.length === 1) {
       sessionId = randomstring.generate();
       this.codeSession = firebase.database().ref(sessionId);
-      this.codeSession.set({code: '', language: '', userId: userId});
+      this.codeSession.set({code: '', language: '', userId: this.userId});
       history.pushState(null, null, '/'+sessionId);
     // join session
     } else {
-      sessionId = url.pathname.slice(1, -1);
+      sessionId = url.pathname.slice(1);
       this.codeSession = firebase.database().ref(sessionId);
+      this.state.codeString = 'this.codeSession'
     }
   }
 
   handleKeyUp(str) {
-    console.log('handleKeyUp: ', str);
+    this.codeSession.child('code').set(str);
+    this.codeSession.child('userId').set(this.userId);
+  }
+
+  updateCode() {
+    
   }
 
   componentWillMount() {
@@ -54,7 +61,7 @@ class App extends Component{
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Welcome to React</h2>
         </div>
-        <CodeArea codeSession={this.codeSession} onKeyUp={this.handleKeyUp}/>
+        <CodeArea codeString={this.state.codeString} onKeyUp={this.handleKeyUp}/>
       </div>
     );
   }
@@ -72,6 +79,7 @@ class CodeArea extends Component {
 
   componentDidMount() {
     this.codeMirror = CodeMirror(document.getElementById('codeArea'), { lineWrapping: true });
+    this.codeMirror.setValue(this.props.codeString);
   }
 
   render() {
