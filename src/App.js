@@ -9,29 +9,33 @@ import randomstring from 'randomstring';
 class App extends Component{
   constructor() {
     super();
-    // this.callback = this.callback.bind(this); // this function will detect changes in text
-  }
-
-  componentDidMount() {
-    this.initializeApi();
+    this.handleKeyUp = this.handleKeyUp.bind(this);
   }
 
   initializeApi() {
     firebase.initializeApp(config);
     var url = window.location;
-    var token = '';
-    var userId = randomstring.generate(16);;
+    var sessionId = '';
+    var userId = randomstring.generate(16);
+    //initialize session
     if (url.pathname.length === 1) {
-      console.log('trigger create session');
-      token = randomstring.generate();
-      this.codeSession = firebase.database().ref(token);
+      sessionId = randomstring.generate();
+      this.codeSession = firebase.database().ref(sessionId);
       this.codeSession.set({code: '', language: '', userId: userId});
-      history.pushState(null, null, '/'+token);
+      history.pushState(null, null, '/'+sessionId);
+    // join session
     } else {
-      console.log('trigger join session');
-      token = url.pathname.slice(1, -1);
-      this.codeSession = firebase.database().ref(token);
+      sessionId = url.pathname.slice(1, -1);
+      this.codeSession = firebase.database().ref(sessionId);
     }
+  }
+
+  handleKeyUp(str) {
+    console.log('handleKeyUp: ', str);
+  }
+
+  componentWillMount() {
+    this.initializeApi();
   }
 
   render() {
@@ -41,7 +45,7 @@ class App extends Component{
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Welcome to React</h2>
         </div>
-        <CodeArea codeSession={this.codeSession} />
+        <CodeArea codeSession={this.codeSession} onKeyUp={this.handleKeyUp}/>
       </div>
     );
   }
@@ -50,7 +54,11 @@ class App extends Component{
 class CodeArea extends Component {
   constructor() {
     super();
-    this.state = {code: 'somestring'};
+    this.getCode = this.getCode.bind(this);
+  }
+
+  getCode() {
+    this.props.onKeyUp(this.codeMirror.getValue())
   }
 
   componentDidMount() {
@@ -58,7 +66,7 @@ class CodeArea extends Component {
   }
 
   render() {
-    return <div id='codeArea'></div> //how to detect changes to text here?
+    return <div id='codeArea' onKeyUp={this.getCode}></div>
   }
 }
 
