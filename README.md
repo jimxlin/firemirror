@@ -1,2 +1,2 @@
-# FireReple
-Collaborative coding app using Firebase and Repl.it.
+# FiREPL
+Collaborative coding and REPL app, using Firebase.

@@ -19,7 +19,7 @@ class App extends Component{
   constructor() {
     super();
     this.handleKeyUp = this.handleKeyUp.bind(this);
-    this.state = {codeString: ''}
+    this.state = {codeString: 'initial string (unchanged)'}
   }
 
   initializeApi() {
@@ -37,7 +37,9 @@ class App extends Component{
     } else {
       sessionId = url.pathname.slice(1);
       this.codeSession = firebase.database().ref(sessionId);
-      this.state.codeString = 'this.codeSession'
+      // this.codeSession.once('value').then(snapshot => console.log(snapshot.val().code) );
+      this.codeSession.once('value').then(snapshot => this.setState({codeString: snapshot.val().code}));
+      // this.setState({codeString: 'changed'});
     }
   }
 
@@ -47,11 +49,15 @@ class App extends Component{
   }
 
   updateCode() {
-    
+
   }
 
   componentWillMount() {
     this.initializeApi();
+  }
+
+  componentDidMount() {
+    console.log(this.state);
   }
 
   render() {
