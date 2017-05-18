@@ -9,17 +9,17 @@ import debounce from 'lodash.debounce';
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOM,
+  //authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOM,
   databaseURL: process.env.REACT_APP_FIREBASE_DB_URL,
-  projectId: process.env.REACT_APP_FIREBASE_PROJ_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STOR_BUCKET
+  //projectId: process.env.REACT_APP_FIREBASE_PROJ_ID,
+  //storageBucket: process.env.REACT_APP_FIREBASE_STOR_BUCKET
 };
 
 class App extends Component{
   constructor() {
     super();
     this.handleKeyUp = this.handleKeyUp.bind(this);
-    this.state = {codeString: 'initial string (unchanged)'}
+    this.state = {codeString: ''}
   }
 
   initializeApi() {
@@ -31,20 +31,20 @@ class App extends Component{
     if (url.pathname.length === 1) {
       sessionId = randomstring.generate();
       this.codeSession = firebase.database().ref(sessionId);
-      this.codeSession.set({code: '', language: '', userId: this.userId});
+      this.codeSession.set({codeString: '', language: '', userId: this.userId});
       history.pushState(null, null, '/'+sessionId);
     // join session
     } else {
       sessionId = url.pathname.slice(1);
       this.codeSession = firebase.database().ref(sessionId);
-      // this.codeSession.once('value').then(snapshot => console.log(snapshot.val().code) );
-      this.codeSession.once('value').then(snapshot => this.setState({codeString: snapshot.val().code}));
-      // this.setState({codeString: 'changed'});
+      this.codeSession.once('value').then(snapshot => {
+        this.setState({codeString: snapshot.val().codeString});
+      });
     }
   }
 
   handleKeyUp(str) {
-    this.codeSession.child('code').set(str);
+    this.codeSession.child('codeString').set(str);
     this.codeSession.child('userId').set(this.userId);
   }
 
@@ -57,7 +57,11 @@ class App extends Component{
   }
 
   componentDidMount() {
-    console.log(this.state);
+    this.codeSession.on('value', snapshot => {
+      if (snapshot.val().userId !== this.userId) {
+        this.setState({codeString: snapshot.val().codeString});
+      }
+    });
   }
 
   render() {
@@ -85,7 +89,10 @@ class CodeArea extends Component {
 
   componentDidMount() {
     this.codeMirror = CodeMirror(document.getElementById('codeArea'), { lineWrapping: true });
-    this.codeMirror.setValue(this.props.codeString);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.codeMirror.setValue(nextProps.codeString);
   }
 
   render() {
