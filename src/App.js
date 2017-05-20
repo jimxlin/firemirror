@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row, Glyphicon } from 'react-bootstrap';
 import * as firebase from 'firebase';
 import CodeMirror from 'codemirror';
 import 'codemirror/mode/javascript/javascript'
@@ -69,7 +69,9 @@ class App extends Component{
   }
 
   handleKeyUp(str) {
-    this.setState({codeString: str})
+    if (this.state.codeString != str) {
+      this.setState({codeString: str})
+    }
     this.codeSession.child('codeString').set(str);
     this.codeSession.child('userId').set(this.userId);
   }
@@ -90,7 +92,8 @@ class App extends Component{
     return (
       <div className="App">
         <div className="App-header">
-          <div className="logo">FiREPL</div>
+          <div className="logo">RTCE_REPL</div>
+          {/* add button to copy url here (use clipboardjs) */}
           <select value={this.state.language} onChange={this.handleLangChange}>
               <option value="javascript">Javascript</option>
               <option value="python">Python</option>
@@ -101,8 +104,7 @@ class App extends Component{
             <option value="4">Tabsize: 4</option>
             <option value="8">Tabsize: 8</option>
           </select>
-          <button className="runCode">Run</button>
-          <div className="App-run"></div>
+          <button className="runCode">Run<Glyphicon glyph="play" /></button>
         </div>
         <CodeArea
           codeString={this.state.codeString}
