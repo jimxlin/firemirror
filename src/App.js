@@ -21,7 +21,13 @@ class App extends Component{
   constructor() {
     super();
     this.handleKeyUp = this.handleKeyUp.bind(this);
-    this.state = {codeString: '', language: 'javascript'}
+    this.handleLangChange = this.handleLangChange.bind(this);
+    this.handleTabChange = this.handleTabChange.bind(this);
+    this.state = {
+      codeString: '',
+      language: 'javascript',
+      tabsize: '2',
+    };
   }
 
   initializeApi() {
@@ -44,12 +50,26 @@ class App extends Component{
       sessionId = url.pathname.slice(1);
       this.codeSession = firebase.database().ref(sessionId);
       this.codeSession.once('value').then(snapshot => {
-        this.setState({codeString: snapshot.val().codeString});
+        this.setState({
+          codeString: snapshot.val().codeString,
+          language: snapshot.val().language
+        });
       });
     }
   }
 
+  handleLangChange(event) {
+    var language = event.target.value
+    this.setState({language: language});
+    this.codeSession.child('language').set(language);
+  }
+
+  handleTabChange(event) {
+    this.setState({tabsize: event.target.value});
+  }
+
   handleKeyUp(str) {
+    this.setState({codeString: str})
     this.codeSession.child('codeString').set(str);
     this.codeSession.child('userId').set(this.userId);
   }
@@ -71,20 +91,24 @@ class App extends Component{
       <div className="App">
         <div className="App-header">
           <div className="logo">FiREPL</div>
-          <select className="syntax">
-              <option>Javascript</option>
-              <option>Python</option>
-              <option>Ruby</option>
+          <select value={this.state.language} onChange={this.handleLangChange}>
+              <option value="javascript">Javascript</option>
+              <option value="python">Python</option>
+              <option value="ruby">Ruby</option>
           </select>
-          <select className="tabsize">
-            <option>Tabsize: 2</option>
-            <option>Tabsize: 4</option>
-            <option>Tabsize: 8</option>
+          <select value={this.state.tabsize} onChange={this.handleTabChange}>
+            <option value="2">Tabsize: 2</option>
+            <option value="4">Tabsize: 4</option>
+            <option value="8">Tabsize: 8</option>
           </select>
           <button className="runCode">Run</button>
           <div className="App-run"></div>
         </div>
-        <CodeArea codeString={this.state.codeString} onKeyUp={this.handleKeyUp}/>
+        <CodeArea
+          codeString={this.state.codeString}
+          language={this.state.language}
+          tabsize={this.state.tabsize}
+          onKeyUp={this.handleKeyUp}/>
       </div>
     );
   }
@@ -96,18 +120,29 @@ class CodeArea extends Component {
   constructor() {
     super();
     this.getCode = this.getCode.bind(this);
+    this.state = {cursor: {line: '0', ch: '0'}} // remember cursor position on re-render
   }
 
   getCode() {
+    this.setState({cursor: this.codeMirror.getCursor()})
     this.props.onKeyUp(this.codeMirror.getValue())
   }
 
   componentDidMount() {
-    this.codeMirror = CodeMirror(document.getElementById('codeArea'), { mode: 'javascript', lineWrapping: true, tabSize: 2, lineNumbers: true });
+    this.codeMirror = CodeMirror(document.getElementById('codeArea'), {
+      mode: this.props.language,
+      tabSize: this.props.tabsize,
+      lineWrapping: true,
+      lineNumbers: true,
+      indentWithTabs: true
+    });
   }
 
   componentWillReceiveProps(nextProps) {
     this.codeMirror.setValue(nextProps.codeString);
+    this.codeMirror.setCursor(this.state.cursor);
+    this.codeMirror.setOption("mode", nextProps.language);
+    this.codeMirror.setOption("tabSize", nextProps.tabsize);
   }
 
   render() {
