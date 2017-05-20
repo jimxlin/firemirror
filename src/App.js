@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
-// import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import * as firebase from 'firebase';
 import CodeMirror from 'codemirror';
+import 'codemirror/mode/javascript/javascript'
+import 'codemirror/mode/python/python'
+import 'codemirror/mode/ruby/ruby'
 import randomstring from 'randomstring';
 import debounce from 'lodash.debounce';
 
@@ -19,7 +21,7 @@ class App extends Component{
   constructor() {
     super();
     this.handleKeyUp = this.handleKeyUp.bind(this);
-    this.state = {codeString: ''}
+    this.state = {codeString: '', language: 'javascript'}
   }
 
   initializeApi() {
@@ -31,8 +33,12 @@ class App extends Component{
     if (url.pathname.length === 1) {
       sessionId = randomstring.generate();
       this.codeSession = firebase.database().ref(sessionId);
-      this.codeSession.set({codeString: '', language: '', userId: this.userId});
-      history.pushState(null, null, '/'+sessionId);
+      this.codeSession.set({
+        codeString: '',
+        language: this.state.language,
+        userId: this.userId
+      });
+      window.history.pushState(null, null, '/'+sessionId);
     // join session
     } else {
       sessionId = url.pathname.slice(1);
@@ -46,10 +52,6 @@ class App extends Component{
   handleKeyUp(str) {
     this.codeSession.child('codeString').set(str);
     this.codeSession.child('userId').set(this.userId);
-  }
-
-  updateCode() {
-
   }
 
   componentWillMount() {
@@ -68,14 +70,27 @@ class App extends Component{
     return (
       <div className="App">
         <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
+          <div className="logo">FiREPL</div>
+          <select className="syntax">
+              <option>Javascript</option>
+              <option>Python</option>
+              <option>Ruby</option>
+          </select>
+          <select className="tabsize">
+            <option>Tabsize: 2</option>
+            <option>Tabsize: 4</option>
+            <option>Tabsize: 8</option>
+          </select>
+          <button className="runCode">Run</button>
+          <div className="App-run"></div>
         </div>
         <CodeArea codeString={this.state.codeString} onKeyUp={this.handleKeyUp}/>
       </div>
     );
   }
 }
+
+
 
 class CodeArea extends Component {
   constructor() {
@@ -88,7 +103,7 @@ class CodeArea extends Component {
   }
 
   componentDidMount() {
-    this.codeMirror = CodeMirror(document.getElementById('codeArea'), { lineWrapping: true });
+    this.codeMirror = CodeMirror(document.getElementById('codeArea'), { mode: 'javascript', lineWrapping: true, tabSize: 2, lineNumbers: true });
   }
 
   componentWillReceiveProps(nextProps) {
