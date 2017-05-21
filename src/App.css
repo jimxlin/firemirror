@@ -7,6 +7,7 @@
 .App-header {
   background-color: #2E7D32;
   height: 75px;
+  width: 100%;
   padding: 20px;
   color: white;
 }
@@ -16,10 +17,24 @@
   font-size: 24px;
 }
 
-select, .runCode {
+select {
+  float: right;
   background-color: #2E7D32;
 }
 
 #codeArea {
+  padding: 0;
+  height: 500px;
+  text-align: left;
+}
+
+.runCode-container {
+  padding: 0;
+}
+
+#runResult {
+  height: 500px;
+  background-color: #222;
+  color: #FFF;
   text-align: left;
 }
