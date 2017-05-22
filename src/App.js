@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import './App.css';
 import { Col, Row, Glyphicon } from 'react-bootstrap';
 import * as firebase from 'firebase';
-import hackerEarth from 'hackerearth-node';
 import CodeMirror from 'codemirror';
 import randomstring from 'randomstring';
 import debounce from 'lodash.debounce';
@@ -50,10 +49,10 @@ class App extends Component{
     firebase.initializeApp(config);
     var url = window.location;
     var sessionId = '';
-    this.userId = randomstring.generate(16);
+    this.userId = randomstring.generate(8);
     //initialize session
     if (url.pathname.length === 1) {
-      sessionId = randomstring.generate();
+      sessionId = randomstring.generate(16);
       this.codeSession = firebase.database().ref(sessionId);
       this.codeSession.set({
         codeString: '',
@@ -105,10 +104,6 @@ class App extends Component{
           tabsize={this.state.tabsize}
           onKeyUp={this.handleKeyUp}
         />
-        <RunResult
-          codeString={this.state.codeString}
-          language={this.state.language}
-        />
       </div>
     );
   }
@@ -146,44 +141,6 @@ class CodeArea extends Component {
 
   render() {
     return <Col md={6} id='codeArea' onKeyUp={debounce(this.getCode, 500)}></Col>
-  }
-}
-
-class RunResult extends Component {
-  constructor() {
-    super();
-    this.handleClickRunCode = this.handleClickRunCode.bind(this);
-  }
-
-  handleClickRunCode() {
-    var config = {
-      time_limit: 2,
-      memory_limit: 131072,
-      source: this.props.codeString,
-      language: this.props.language,
-      async: '1'
-    };
-    this.hackerEarth.run(config).then(result => {
-      console.log(result);
-    }).catch(err => {
-
-    });
-  }
-
-  componentWillMount() {
-    var hackerEarthApiKey = process.env.REACT_APP_HACKEREARTH_API_KEY;
-    this.hackerEarth = new hackerEarth(hackerEarthApiKey);
-  }
-
-  render() {
-    return (
-      <Col md={6} className="runCode-container">
-        <button className="runCode" onClick={this.handleClickRunCode}>
-          Run<Glyphicon glyph="play" />
-        </button>
-        <div id='runResult'>running code result</div>
-      </Col>
-    )
   }
 }
 
