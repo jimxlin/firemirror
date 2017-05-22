@@ -85,7 +85,7 @@ class App extends Component{
     return (
       <div className="App">
         <div className="App-header">
-          <div className="logo">RTCE_REPL</div>
+          <div className="logo">FireMirror</div>
           {/* add button to copy url here (use clipboardjs) */}
           <select value={this.state.language} onChange={this.handleLangChange}>
             <option value="JAVASCRIPT">Javascript</option>

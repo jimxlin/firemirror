@@ -1,2 +1,2 @@
-# RTCE_REPL
-Real Time Collaborative Editing combined with Read–Eval–Print Loop.
+# FireMirror
+Real-time collaborative code editing with Firebase and CodeMirror.
