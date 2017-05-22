@@ -12,10 +12,7 @@ import 'codemirror/mode/ruby/ruby';
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  //authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOM,
-  databaseURL: process.env.REACT_APP_FIREBASE_DB_URL,
-  //projectId: process.env.REACT_APP_FIREBASE_PROJ_ID,
-  //storageBucket: process.env.REACT_APP_FIREBASE_STOR_BUCKET
+  databaseURL: process.env.REACT_APP_FIREBASE_DB_URL
 };
 
 class App extends Component{
