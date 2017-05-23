@@ -22,11 +22,15 @@ class App extends Component{
     this.handleCodeKeyUp = this.handleCodeKeyUp.bind(this);
     this.handleLangChange = this.handleLangChange.bind(this);
     this.handleTabChange = this.handleTabChange.bind(this);
+    this.handleWordwrapChange = this.handleWordwrapChange.bind(this);
+    this.handleThemeChange = this.handleThemeChange.bind(this);
     this.handleChatKeyUp = this.handleChatKeyUp.bind(this);
     this.state = {
       codeString: '',
       language: 'javascript',
       tabsize: '2',
+      wordwrap: 'true',
+      theme: 'default',
       chat: []
     };
   }
@@ -39,6 +43,14 @@ class App extends Component{
 
   handleTabChange(event) {
     this.setState({tabsize: event.target.value});
+  }
+
+  handleWordwrapChange(event) {
+    this.setState({wordwrap: event.target.value});
+  }
+
+  handleThemeChange(event) {
+    this.setState({theme: event.target.value});
   }
 
   handleCodeKeyUp(str) {
@@ -118,11 +130,26 @@ class App extends Component{
             <option value="4">Tab Size: 4</option>
             <option value="8">Tab Size: 8</option>
           </select>
+          <select value={this.state.wordwrap} onChange={this.handleWordwrapChange}>
+            <option value="true">Word Wrap: On</option>
+            <option value="false">Word Wrap: Off</option>
+          </select>
+          <select value={this.state.theme} onChange={this.handleThemeChange}>
+            <option value="default">Default Theme</option>
+            <option value="eclipse">Eclipse Theme</option>
+            <option value="solarized">Solarized Theme</option>
+            <option value="yeti">Yeti Theme</option>
+            <option value="monokai">Monokai Theme</option>
+            <option value="dracula">Dracula Theme</option>
+            <option value="blackboard">Blackboard Theme</option>
+          </select>
         </div>
         <CodeArea
           codeString={this.state.codeString}
           language={this.state.language}
           tabsize={this.state.tabsize}
+          wordwrap={this.state.wordwrap}
+          theme={this.state.theme}
           onKeyUp={this.handleCodeKeyUp}
         />
         <ChatArea
@@ -152,7 +179,8 @@ class CodeArea extends Component {
       tabSize: this.props.tabsize,
       lineWrapping: true,
       lineNumbers: true,
-      indentWithTabs: true
+      indentWithTabs: true,
+      theme: 'default'
     });
     this.codeMirror.setSize(null, 500);
   }
@@ -162,6 +190,8 @@ class CodeArea extends Component {
     this.codeMirror.setCursor(this.state.cursor);
     this.codeMirror.setOption("mode", nextProps.language);
     this.codeMirror.setOption("tabSize", nextProps.tabsize);
+    this.codeMirror.setOption("lineWrapping", nextProps.wordwrap === 'true');
+    this.codeMirror.setOption("theme", nextProps.theme);
   }
 
   render() {
@@ -176,6 +206,7 @@ class ChatArea extends Component {
   }
 
   sendMessage(event) {
+    event.target.scrollTop = event.target.scrollHeight;
     if (event.key === 'Enter') {
       var msg = event.target.value;
       if (msg !== '') {
@@ -199,7 +230,7 @@ class ChatArea extends Component {
         <div>
           {messages.length > 0 && messages}
         </div>
-        <input type='text' onKeyUp={this.sendMessage}></input>
+        <textarea onKeyUp={this.sendMessage}></textarea>
       </Col>
     )
   }
