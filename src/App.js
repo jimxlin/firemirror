@@ -24,7 +24,7 @@ class App extends Component{
     this.handleTabChange = this.handleTabChange.bind(this);
     this.handleWordwrapChange = this.handleWordwrapChange.bind(this);
     this.handleThemeChange = this.handleThemeChange.bind(this);
-    this.handleChatKeyUp = this.handleChatKeyUp.bind(this);
+    this.handleChatKeyPress = this.handleChatKeyPress.bind(this);
     this.state = {
       codeString: '',
       language: 'javascript',
@@ -61,7 +61,7 @@ class App extends Component{
     }
   }
 
-  handleChatKeyUp(msg) {
+  handleChatKeyPress(msg) {
     this.codeSession.child('chat').push().set({
       'user_id': this.userId,
       'text': msg
@@ -141,6 +141,7 @@ class App extends Component{
             <option value="yeti">Yeti Theme</option>
             <option value="monokai">Monokai Theme</option>
             <option value="dracula">Dracula Theme</option>
+            <option value="cobalt">Cobalt Theme</option>
             <option value="blackboard">Blackboard Theme</option>
           </select>
         </div>
@@ -154,7 +155,7 @@ class App extends Component{
         />
         <ChatArea
           chat={this.state.chat}
-          onKeyUp={this.handleChatKeyUp}
+          onKeyPress={this.handleChatKeyPress}
         />
       </div>
     );
@@ -206,31 +207,28 @@ class ChatArea extends Component {
   }
 
   sendMessage(event) {
-    event.target.scrollTop = event.target.scrollHeight;
     if (event.key === 'Enter') {
+      event.preventDefault();
       var msg = event.target.value;
       if (msg !== '') {
-        this.props.onKeyUp(msg);
+        this.props.onKeyPress(msg);
+        this.textInput.value = '';
       }
     }
   }
 
-  componentDidMount() {
-
-  }
-
-  componentWillReceiveProps(nextProps) {
-
+  componentDidUpdate() {
+    this.viewChat.scrollTop = this.viewChat.scrollHeight;
   }
 
   render() {
     var messages = this.props.chat.map(msg => <p key={msg.key}>{msg.user_id}: {msg.text}</p>);
     return (
       <Col md={4} id='chatArea'>
-        <div>
+        <div ref={view => this.viewChat = view}>
           {messages.length > 0 && messages}
         </div>
-        <textarea onKeyUp={this.sendMessage}></textarea>
+        <textarea onKeyPress={this.sendMessage} ref={input => this.textInput = input}></textarea>
       </Col>
     )
   }

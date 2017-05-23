@@ -5,6 +5,7 @@ import 'codemirror/theme/solarized.css';
 import 'codemirror/theme/yeti.css';
 import 'codemirror/theme/monokai.css';
 import 'codemirror/theme/dracula.css';
+import 'codemirror/theme/cobalt.css';
 import 'codemirror/theme/blackboard.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
