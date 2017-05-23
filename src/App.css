@@ -28,13 +28,17 @@ select {
   text-align: left;
 }
 
-.runCode-container {
-  padding: 0;
-}
-
-#runResult {
+#chatArea {
   height: 500px;
   background-color: #222;
   color: #FFF;
   text-align: left;
+}
+
+#chatArea div {
+  height: 400px;
+}
+
+#chatArea input {
+  color: #000;
 }

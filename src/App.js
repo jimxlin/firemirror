@@ -11,19 +11,23 @@ import 'codemirror/mode/ruby/ruby';
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  databaseURL: process.env.REACT_APP_FIREBASE_DB_URL
+  // authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_FIREBASE_DB_URL,
+  // storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET
 };
 
 class App extends Component{
   constructor() {
     super();
-    this.handleKeyUp = this.handleKeyUp.bind(this);
+    this.handleCodeKeyUp = this.handleCodeKeyUp.bind(this);
     this.handleLangChange = this.handleLangChange.bind(this);
     this.handleTabChange = this.handleTabChange.bind(this);
+    this.handleChatKeyUp = this.handleChatKeyUp.bind(this);
     this.state = {
       codeString: '',
       language: 'javascript',
       tabsize: '2',
+      chat: []
     };
   }
 
@@ -37,12 +41,19 @@ class App extends Component{
     this.setState({tabsize: event.target.value});
   }
 
-  handleKeyUp(str) {
+  handleCodeKeyUp(str) {
     if (this.state.codeString !== str) {
       this.setState({codeString: str});
       this.codeSession.child('codeString').set(str);
       this.codeSession.child('userId').set(this.userId);
     }
+  }
+
+  handleChatKeyUp(msg) {
+    this.codeSession.child('chat').push().set({
+      'user_id': this.userId,
+      'text': msg
+    });
   }
 
   componentWillMount() {
@@ -57,7 +68,8 @@ class App extends Component{
       this.codeSession.set({
         codeString: '',
         language: this.state.language,
-        userId: this.userId
+        userId: this.userId,
+        chat: []
       });
       window.history.pushState(null, null, '/'+sessionId);
     // join session
@@ -79,6 +91,15 @@ class App extends Component{
         this.setState({codeString: snapshot.val().codeString});
       }
     });
+    this.codeSession.child('chat').orderByKey().on('child_added', (snapshot, prevChildKey) => {
+      var message = snapshot.val();
+      var key = snapshot.getKey()
+      this.state.chat.push({
+        user_id: message.user_id,
+        text: message.text,
+        key: key
+      });
+    });
   }
 
   render() {
@@ -88,9 +109,9 @@ class App extends Component{
           <div className="logo">FireMirror</div>
           {/* add button to copy url here (use clipboardjs) */}
           <select value={this.state.language} onChange={this.handleLangChange}>
-            <option value="JAVASCRIPT">Javascript</option>
-            <option value="PYTHON">Python</option>
-            <option value="RUBY">Ruby</option>
+            <option value="javascript">Javascript</option>
+            <option value="python">Python</option>
+            <option value="ruby">Ruby</option>
           </select>
           <select value={this.state.tabsize} onChange={this.handleTabChange}>
             <option value="2">Tab Size: 2</option>
@@ -102,7 +123,11 @@ class App extends Component{
           codeString={this.state.codeString}
           language={this.state.language}
           tabsize={this.state.tabsize}
-          onKeyUp={this.handleKeyUp}
+          onKeyUp={this.handleCodeKeyUp}
+        />
+        <ChatArea
+          chat={this.state.chat}
+          onKeyUp={this.handleChatKeyUp}
         />
       </div>
     );
@@ -140,7 +165,43 @@ class CodeArea extends Component {
   }
 
   render() {
-    return <Col md={6} id='codeArea' onKeyUp={debounce(this.getCode, 500)}></Col>
+    return <Col md={8} id='codeArea' onKeyUp={debounce(this.getCode, 500)}></Col>
+  }
+}
+
+class ChatArea extends Component {
+  constructor() {
+    super();
+    this.sendMessage = this.sendMessage.bind(this);
+  }
+
+  sendMessage(event) {
+    if (event.key === 'Enter') {
+      var msg = event.target.value;
+      if (msg !== '') {
+        this.props.onKeyUp(msg);
+      }
+    }
+  }
+
+  componentDidMount() {
+
+  }
+
+  componentWillReceiveProps(nextProps) {
+
+  }
+
+  render() {
+    var messages = this.props.chat.map(msg => <p key={msg.key}>{msg.user_id}: {msg.text}</p>);
+    return (
+      <Col md={4} id='chatArea'>
+        <div>
+          {messages.length > 0 && messages}
+        </div>
+        <input type='text' onKeyUp={this.sendMessage}></input>
+      </Col>
+    )
   }
 }
 
