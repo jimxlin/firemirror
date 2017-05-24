@@ -31,20 +31,22 @@ select {
 
 #chatArea {
   height: 500px;
+  padding: 0;
   background-color: #222;
   color: #FFF;
   text-align: left;
 }
 
 #chatArea div {
+  padding: 10px;
   overflow-y: scroll;
   overflow-x: hidden;
   overflow-wrap: break-word;
-  height: 400px;
+  height: 450px;
 }
 
 #chatArea textarea {
-  margin-top: 10px;
   color: #000;
   width: 100%;
+  height: 50px;
 }
