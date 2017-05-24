@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "bootstrap": "^3.3.7",
     "codemirror": "^5.26.0",
     "firebase": "^3.7.8",
     "lodash.debounce": "^4.0.8",
     "randomstring": "^1.1.5",
     "react": "^15.5.4",
+    "react-bootstrap": "^0.31.0",
     "react-dom": "^15.5.4"
   },
   "devDependencies": {

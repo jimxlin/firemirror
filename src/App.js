@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-// import { Col, Row, Glyphicon } from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
 import * as firebase from 'firebase';
 import CodeMirror from 'codemirror';
 import randomstring from 'randomstring';
@@ -200,7 +200,10 @@ class CodeArea extends Component {
   }
 
   render() {
-    return <div id='codeArea' onKeyUp={debounce(this.getCode, 500)}></div>
+    return <Col id='codeArea'
+                xs={8} sm={9} md={10}
+                onKeyUp={debounce(this.getCode, 500)}>
+            </Col>
   }
 }
 
@@ -228,13 +231,13 @@ class ChatArea extends Component {
   render() {
     var messages = this.props.chat.map(msg => <p key={msg.key}><b>{msg.user_id}</b>: {msg.text}</p>);
     return (
-      <div id='chatArea'>
-        <div className="chat-header"><b>Chatroom</b></div>
+      <Col id='chatArea' xs={4} sm={3} md={2}>
         <div className="view-chat" ref={view => this.viewChat = view}>
+          <div className="chat-header"><b>Chatroom</b></div>
           {messages.length > 0 && messages}
         </div>
         <textarea onKeyPress={this.sendMessage} ref={input => this.textInput = input}></textarea>
-      </div>
+      </Col>
     )
   }
 }
