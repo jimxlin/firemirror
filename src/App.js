@@ -2,9 +2,14 @@ import React, { Component } from 'react';
 import './App.css';
 import { Col } from 'react-bootstrap';
 import * as firebase from 'firebase';
-import CodeMirror from 'codemirror';
 import randomstring from 'randomstring';
 import debounce from 'lodash.debounce';
+import CodeMirror from 'codemirror';
+import 'codemirror/addon/search/search';
+import 'codemirror/addon/search/searchcursor';
+import 'codemirror/addon/dialog/dialog';
+import 'codemirror/addon/dialog/dialog.css';
+
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -21,7 +26,7 @@ class App extends Component{
     this.handleThemeChange = this.handleThemeChange.bind(this);
     this.handleChatKeyPress = this.handleChatKeyPress.bind(this);
     this.state = {
-      codeString: '',
+      codeString: '# Firemirror \nThis is a realtime collaborative document, just share the URL to start collaborating!',
       language: 'markdown',
       tabsize: '2',
       wordwrap: 'true',
@@ -73,7 +78,7 @@ class App extends Component{
       sessionId = randomstring.generate(16);
       this.codeSession = firebase.database().ref(sessionId);
       this.codeSession.set({
-        codeString: '',
+        codeString: '# Firemirror \nThis is a realtime collaborative document, just share the URL to start collaborating!',
         language: this.state.language,
         userId: this.userId,
         chat: []
@@ -185,7 +190,7 @@ class CodeArea extends Component {
       lineNumbers: true,
       indentWithTabs: true,
       theme: 'monokai',
-      value: '# Firemirror \nThis is a realtime collaborative document, just share this URL to start collaborating!'
+      value: this.props.codeString
     });
     this.codeMirror.setSize(null, "100%");
   }
@@ -201,7 +206,7 @@ class CodeArea extends Component {
 
   render() {
     return <Col id='codeArea'
-                xs={8} sm={9} md={10}
+                xs={12} sm={9} md={10}
                 onKeyUp={debounce(this.getCode, 500)}>
             </Col>
   }
@@ -231,7 +236,7 @@ class ChatArea extends Component {
   render() {
     var messages = this.props.chat.map(msg => <p key={msg.key}><b>{msg.user_id}</b>: {msg.text}</p>);
     return (
-      <Col id='chatArea' xs={4} sm={3} md={2}>
+      <Col id='chatArea' xs={12} sm={3} md={2}>
         <div className="view-chat" ref={view => this.viewChat = view}>
           <div className="chat-header"><b>Chatroom</b></div>
           {messages.length > 0 && messages}

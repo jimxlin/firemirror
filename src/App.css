@@ -19,6 +19,12 @@
   font-size: 24px;
 }
 
+@media (max-width: 768px) {
+  .logo {
+    font-size: 20px;
+  }
+}
+
 .options {
   text-align: right;
 }
@@ -26,10 +32,17 @@
 select {
   display: inline-block;
   background-color: #E53935;
-  margin: 5px 20px 0 0;
+  margin: 5px 0 0 20px;
   outline: none;
   border: none;
   font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  select {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+  }
 }
 
 option {
@@ -52,6 +65,13 @@ option {
   border-left: solid;
   border-color: #000;
   border-width: 1px;
+}
+
+@media (max-width: 768px) {
+  #chatArea {
+    height: 35vh;
+    padding: 0;
+  }
 }
 
 #chatArea .chat-header {
