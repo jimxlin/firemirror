@@ -13,7 +13,7 @@ import 'codemirror/addon/dialog/dialog.css';
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  databaseURL: process.env.REACT_APP_FIREBASE_DB_URL,
+  databaseURL: process.env.REACT_APP_FIREBASE_DB_URL
 };
 
 class App extends Component{
@@ -106,11 +106,12 @@ class App extends Component{
     this.codeSession.child('chat').orderByKey().on('child_added', (snapshot, prevChildKey) => {
       var message = snapshot.val();
       var key = snapshot.getKey()
-      this.state.chat.push({
+      var newChat = this.state.chat.concat([{
         user_id: message.user_id,
         text: message.text,
         key: key
-      });
+      }]);
+      this.setState({chat: newChat});
     });
   }
 
