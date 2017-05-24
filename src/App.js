@@ -1,19 +1,14 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Col, Row, Glyphicon } from 'react-bootstrap';
+// import { Col, Row, Glyphicon } from 'react-bootstrap';
 import * as firebase from 'firebase';
 import CodeMirror from 'codemirror';
 import randomstring from 'randomstring';
 import debounce from 'lodash.debounce';
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/mode/python/python';
-import 'codemirror/mode/ruby/ruby';
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  // authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
   databaseURL: process.env.REACT_APP_FIREBASE_DB_URL,
-  // storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET
 };
 
 class App extends Component{
@@ -27,10 +22,10 @@ class App extends Component{
     this.handleChatKeyPress = this.handleChatKeyPress.bind(this);
     this.state = {
       codeString: '',
-      language: 'javascript',
+      language: 'markdown',
       tabsize: '2',
       wordwrap: 'true',
-      theme: 'default',
+      theme: 'monokai',
       chat: []
     };
   }
@@ -119,31 +114,39 @@ class App extends Component{
       <div className="App">
         <div className="App-header">
           <div className="logo">FireMirror</div>
-          {/* add button to copy url here (use clipboardjs) */}
-          <select value={this.state.language} onChange={this.handleLangChange}>
-            <option value="javascript">Javascript</option>
-            <option value="python">Python</option>
-            <option value="ruby">Ruby</option>
-          </select>
-          <select value={this.state.tabsize} onChange={this.handleTabChange}>
-            <option value="2">Tab Size: 2</option>
-            <option value="4">Tab Size: 4</option>
-            <option value="8">Tab Size: 8</option>
-          </select>
-          <select value={this.state.wordwrap} onChange={this.handleWordwrapChange}>
-            <option value="true">Word Wrap: On</option>
-            <option value="false">Word Wrap: Off</option>
-          </select>
-          <select value={this.state.theme} onChange={this.handleThemeChange}>
-            <option value="default">Default Theme</option>
-            <option value="eclipse">Eclipse Theme</option>
-            <option value="solarized">Solarized Theme</option>
-            <option value="yeti">Yeti Theme</option>
-            <option value="monokai">Monokai Theme</option>
-            <option value="dracula">Dracula Theme</option>
-            <option value="cobalt">Cobalt Theme</option>
-            <option value="blackboard">Blackboard Theme</option>
-          </select>
+          <div className="options">
+            <select value={this.state.language} onChange={this.handleLangChange}>
+              <option value="text/x-csrc">C</option>
+              <option value="text/x-c++src">C++</option>
+              <option value="text/x-csharp">C#</option>
+              <option value="htmlmixed">HTML</option>
+              <option value="text/x-java">Java</option>
+              <option value="javascript">Javascript</option>
+              <option value="markdown">Markdown</option>
+              <option value="python">Python</option>
+              <option value="ruby">Ruby</option>
+              <option value="text/x-sql">SQL</option>
+            </select>
+            <select value={this.state.theme} onChange={this.handleThemeChange}>
+              <option value="default">Default</option>
+              <option value="eclipse">Eclipse</option>
+              <option value="solarized">Solarized</option>
+              <option value="yeti">Yeti</option>
+              <option value="monokai">Monokai</option>
+              <option value="dracula">Dracula</option>
+              <option value="cobalt">Cobalt</option>
+              <option value="blackboard">Blackboard</option>
+            </select>
+            <select value={this.state.tabsize} onChange={this.handleTabChange}>
+              <option value="2">Tab Size: 2</option>
+              <option value="4">Tab Size: 4</option>
+              <option value="8">Tab Size: 8</option>
+            </select>
+            <select value={this.state.wordwrap} onChange={this.handleWordwrapChange}>
+              <option value="true">Word Wrap: On</option>
+              <option value="false">Word Wrap: Off</option>
+            </select>
+          </div>
         </div>
         <CodeArea
           codeString={this.state.codeString}
@@ -166,7 +169,7 @@ class CodeArea extends Component {
   constructor() {
     super();
     this.getCode = this.getCode.bind(this);
-    this.state = {cursor: {line: '0', ch: '0'}}; // remember cursor position on re-render
+    this.state = {cursor: {line: '0', ch: '0'}};
   }
 
   getCode() {
@@ -181,9 +184,10 @@ class CodeArea extends Component {
       lineWrapping: true,
       lineNumbers: true,
       indentWithTabs: true,
-      theme: 'default'
+      theme: 'monokai',
+      value: '# Firemirror \nThis is a realtime collaborative document, just share this URL to start collaborating!'
     });
-    this.codeMirror.setSize(null, 500);
+    this.codeMirror.setSize(null, "100%");
   }
 
   componentWillReceiveProps(nextProps) {
@@ -196,7 +200,7 @@ class CodeArea extends Component {
   }
 
   render() {
-    return <Col md={8} id='codeArea' onKeyUp={debounce(this.getCode, 500)}></Col>
+    return <div id='codeArea' onKeyUp={debounce(this.getCode, 500)}></div>
   }
 }
 
@@ -222,14 +226,15 @@ class ChatArea extends Component {
   }
 
   render() {
-    var messages = this.props.chat.map(msg => <p key={msg.key}>{msg.user_id}: {msg.text}</p>);
+    var messages = this.props.chat.map(msg => <p key={msg.key}><b>{msg.user_id}</b>: {msg.text}</p>);
     return (
-      <Col md={4} id='chatArea'>
-        <div ref={view => this.viewChat = view}>
+      <div id='chatArea'>
+        <div className="chat-header"><b>Chatroom</b></div>
+        <div className="view-chat" ref={view => this.viewChat = view}>
           {messages.length > 0 && messages}
         </div>
         <textarea onKeyPress={this.sendMessage} ref={input => this.textInput = input}></textarea>
-      </Col>
+      </div>
     )
   }
 }
