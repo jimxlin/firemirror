@@ -103,15 +103,11 @@ class App extends Component{
         this.setState({codeString: snapshot.val().codeString});
       }
     });
-    this.codeSession.child('chat').orderByKey().on('child_added', (snapshot, prevChildKey) => {
-      var message = snapshot.val();
-      var key = snapshot.getKey()
-      var newChat = this.state.chat.concat([{
-        user_id: message.user_id,
-        text: message.text,
-        key: key
-      }]);
-      this.setState({chat: newChat});
+    this.codeSession.child('chat').on('value', snapshot => {
+      var chat = snapshot.val();
+      var chatAry = Object.keys(chat).map(key => Object.assign(chat[key], {key: key}));
+      // chatAry.sort((a,b) => a.key < b.key ? -1 : 1);
+      this.setState({chat: chatAry});
     });
   }
 
