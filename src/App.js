@@ -105,7 +105,7 @@ class App extends Component{
     });
     this.codeSession.child('chat').on('value', snapshot => {
       var chat = snapshot.val();
-      var chatAry = Object.keys(chat).map(key => Object.assign(chat[key], {key: key}));
+      var chatAry = chat ? Object.keys(chat).map(key => Object.assign({}, chat[key], {key: key})) : [];
       // chatAry.sort((a,b) => a.key < b.key ? -1 : 1);
       this.setState({chat: chatAry});
     });
